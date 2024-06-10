@@ -1,19 +1,9 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
-import { Observable, catchError, throwError } from 'rxjs';
+import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common'
+import { Observable, catchError, throwError } from 'rxjs'
 
 @Injectable()
 export class ErrorHandlingInterceptor implements NestInterceptor {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     return next.handle().pipe(
       catchError((err) =>
         throwError(
@@ -24,13 +14,13 @@ export class ErrorHandlingInterceptor implements NestInterceptor {
                 message: err.message,
                 data: {
                   result: err,
-                  meta: {},
-                },
+                  meta: {}
+                }
               },
-              err.statusCode || HttpStatus.BAD_REQUEST,
-            ),
-        ),
-      ),
-    );
+              err.statusCode || HttpStatus.BAD_REQUEST
+            )
+        )
+      )
+    )
   }
 }

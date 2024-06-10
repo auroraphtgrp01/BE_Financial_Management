@@ -4,6 +4,4 @@ import { JwtService } from '@nestjs/jwt'
 import { IUser } from 'src/interfaces/User.interface'
 
 @Injectable()
-export class AuthService {
-
-}
+export class AuthService {}
