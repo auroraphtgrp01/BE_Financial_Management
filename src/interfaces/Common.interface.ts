@@ -9,13 +9,29 @@ export interface IConfigService {
   jwt: {
     JWT_ACCESS_TOKEN_SECRET_KEY: string
     JWT_ACCESS_TOKEN_EXPIRATION_TIME: string
+    ACCESS_TOKEN_EXPIRATION_TIME: string
+    ACCESS_TOKEN_SECRET_KEY: string
   }
 }
 
 export interface IPathService {
-  users: {
-    ddl: string
-  }
+  users: IQueryUserOptions
+  orders: IQueryOrderOptions
+}
+
+export interface IQueryUserOptions extends IQueryOptions {
+  findUserById?: string
+}
+
+export interface IQueryOrderOptions extends IQueryOptions {}
+
+export interface IQueryOptions {
+  ddl: string
+  findAll?: string
+  findOne?: string
+  create?: string
+  update?: string
+  delete?: string
 }
 
 export interface IMigrateParams {

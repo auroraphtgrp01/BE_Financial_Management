@@ -3,6 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { DatabaseService } from 'src/database/database.service'
 import { PathService } from 'src/path/path.service'
+import { resolveSql } from 'src/database/resolveSql'
+import { of, switchMap } from 'rxjs'
 
 @Injectable()
 export class UsersService {
@@ -11,9 +13,10 @@ export class UsersService {
     private readonly pathService: PathService
   ) {}
   create(createUserDto: CreateUserDto) {
-    const sqlPath = this.pathService.getPath('users', 'ddl')
-    const result = this.databaseService.queryByFile(sqlPath)
-    return result
+    const sqlPathToQueryById = this.pathService.getPath('users', 'findUserById')
+    const sqlRaw = resolveSql(sqlPathToQueryById, true) as string
+    const queryClause = 'id = 2'
+    return of(sqlRaw.replace('{ WHERE_CLAUSE }', queryClause)).pipe(switchMap((sql) => this.databaseService.query(sql)))
   }
 
   findAll() {

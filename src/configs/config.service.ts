@@ -11,7 +11,9 @@ export class ConfigService {
     },
     jwt: {
       JWT_ACCESS_TOKEN_SECRET_KEY: 'secretKey',
-      JWT_ACCESS_TOKEN_EXPIRATION_TIME: '60s'
+      JWT_ACCESS_TOKEN_EXPIRATION_TIME: '60s',
+      ACCESS_TOKEN_EXPIRATION_TIME: '60s',
+      ACCESS_TOKEN_SECRET_KEY: 'secretKey'
     }
   }
 
