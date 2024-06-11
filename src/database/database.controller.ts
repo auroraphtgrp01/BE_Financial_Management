@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { IMigrateParams } from 'src/interfaces/Common.interface'
 

@@ -16,14 +16,11 @@ export interface IConfigService {
 
 export interface IPathService {
   users: IQueryUserOptions
-  orders: IQueryOrderOptions
 }
 
 export interface IQueryUserOptions extends IQueryOptions {
   findUserById?: string
 }
-
-export interface IQueryOrderOptions extends IQueryOptions {}
 
 export interface IQueryOptions {
   ddl: string

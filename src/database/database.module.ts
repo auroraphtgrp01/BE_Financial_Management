@@ -2,7 +2,6 @@ import { DynamicModule, Global, Module } from '@nestjs/common'
 import { DatabaseService } from './database.service'
 import { Pool, PoolConfig } from 'pg'
 import { ConfigService } from 'src/configs/config.service'
-import { ConfigModule } from 'src/configs/config.module'
 import { DatabaseController } from 'src/database/database.controller'
 
 @Global()

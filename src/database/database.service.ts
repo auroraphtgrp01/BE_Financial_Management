@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { Pool, QueryResult } from 'pg'
+import { Pool } from 'pg'
 import { Observable, finalize, from, map, switchMap, catchError, mergeMap, of } from 'rxjs'
 import { resolveSql } from 'src/database/resolveSql'
 import { IMigrateParams } from 'src/interfaces/Common.interface'
