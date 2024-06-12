@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { catchError, map } from 'rxjs'
+import { catchError, forkJoin, map } from 'rxjs'
 import { RegisterDto } from 'src/auth/dto/register.dto'
 import { ConfigService } from 'src/configs/config.service'
 import { DatabaseService } from 'src/database/database.service'
@@ -18,7 +18,6 @@ export class AuthService {
 
   register(registerDto: RegisterDto) {
     const sqlPath = this.queryService.getPath('users', 'insertNewUser')
-
     return this.databaseService
       .queryByFile(sqlPath, [
         registerDto.name,
@@ -36,22 +35,24 @@ export class AuthService {
             name: res[0].name,
             phoneNumber: res[0].phone_number
           }
-          const refreshToken = this.jwtService.sign(payload, {
+          const refreshToken$ = this.jwtService.signAsync(payload, {
             secret: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_SECRET_KEY,
             expiresIn: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_EXPIRATION_TIME
           })
-          const accessToken = this.jwtService.sign(payload, {
+          const accessToken$ = this.jwtService.signAsync(payload, {
             secret: this.configService.getConfigService('jwt').ACCESS_TOKEN_SECRET_KEY,
             expiresIn: this.configService.getConfigService('jwt').ACCESS_TOKEN_EXPIRATION_TIME
           })
-          return {
-            messages: 'User has been registered',
-            data: {
-              ...res[0],
-              refreshToken,
-              accessToken
-            }
-          }
+          return forkJoin([refreshToken$, accessToken$]).pipe(
+            map(([refreshToken, accessToken]) => ({
+              messages: 'User has been registered',
+              data: {
+                ...res[0],
+                refreshToken,
+                accessToken
+              }
+            }))
+          )
         }),
         catchError((err) => {
           if (err.code === '23505') {
