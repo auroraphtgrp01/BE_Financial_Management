@@ -1,0 +1,20 @@
+-- DDL USERS
+DROP TABLE IF EXISTS users CASCADE;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE TABLE IF NOT EXISTS users (
+    id UUID DEFAULT gen_random_uuid() NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    userPassword VARCHAR(255) NOT NULL,
+    phoneNumber VARCHAR(10) NOT NULL,
+    gender VARCHAR(5) NOT NULL,
+    dateOfBirth DATE NOT NULL,
+    refreshToken VARCHAR(255) DEFAULT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    createdBy UUID DEFAULT NULL,
+    updateInfo JSONB DEFAULT NULL,
+    deleteInfo JSONB DEFAULT NULL,
+    CONSTRAINT "User_PKey" PRIMARY KEY(id)
+);
+-- INDEXES
+CREATE UNIQUE INDEX "User_Email_Unique" ON users("email");
