@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     phoneNumber VARCHAR(10) NOT NULL,
     gender VARCHAR(5) NOT NULL,
     dateOfBirth DATE NOT NULL,
-    refreshToken VARCHAR(255) DEFAULT NULL,
+    refreshToken TEXT DEFAULT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     createdBy UUID DEFAULT NULL,
     updateInfo JSONB DEFAULT NULL,

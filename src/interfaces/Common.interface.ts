@@ -21,6 +21,7 @@ export interface IQueryService {
 export interface IQueryUserOptions extends IQueryOptions {
   findUserById?: string
   insertNewUser: string
+  updateRefreshToken: string
 }
 
 export interface IQueryOptions {

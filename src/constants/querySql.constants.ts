@@ -9,6 +9,7 @@ export const pathSql: IQueryService = {
     ddl: `${basePath.users}/ddl.sql`,
     findUserById: `${basePath.users}/findUserById.sql`,
     findAll: `${basePath.users}/findAllUser.sql`,
-    insertNewUser: `${basePath.users}/insertNewUser.sql`
+    insertNewUser: `${basePath.users}/insertNewUser.sql`,
+    updateRefreshToken: `${basePath.users}/updateRefreshToken.sql`
   }
 }
