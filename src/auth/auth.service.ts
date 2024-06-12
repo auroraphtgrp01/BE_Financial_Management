@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { catchError, forkJoin, map, mergeMap } from 'rxjs'
+import { catchError, forkJoin, map, mergeMap, switchMap } from 'rxjs'
 import { RegisterDto } from 'src/auth/dto/register.dto'
 import { ConfigService } from 'src/configs/config.service'
 import { DatabaseService } from 'src/database/database.service'
@@ -17,59 +17,57 @@ export class AuthService {
   ) { }
 
   register(registerDto: RegisterDto) {
-    const sqlPath = this.queryService.getPath('users', 'insertNewUser');
+    const sqlPath = this.queryService.getPath('users', 'insertNewUser')
+    return hashPassword(registerDto.userPassword).pipe(
+      switchMap((hashedPassword) =>
+        this.databaseService.queryByFile(sqlPath, [
+          registerDto.name,
+          registerDto.email,
+          hashedPassword,
+          registerDto.phoneNumber,
+          registerDto.gender,
+          registerDto.dateOfBirth
+        ])
+      ),
+      mergeMap((res) => {
+        const payload = {
+          userId: res[0].id,
+          email: res[0].email,
+          name: res[0].name,
+          phoneNumber: res[0].phone_number
+        }
 
-    return this.databaseService
-      .queryByFile(sqlPath, [
-        registerDto.name,
-        registerDto.email,
-        hashPassword(registerDto.userPassword),
-        registerDto.phoneNumber,
-        registerDto.gender,
-        registerDto.dateOfBirth
-      ])
-      .pipe(
-        mergeMap((res) => {
-          const payload = {
-            userId: res[0].id,
-            email: res[0].email,
-            name: res[0].name,
-            phoneNumber: res[0].phone_number
-          };
-
-          const refreshToken$ = this.jwtService.signAsync(payload, {
-            secret: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_SECRET_KEY,
-            expiresIn: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_EXPIRATION_TIME
-          })
-          const accessToken$ = this.jwtService.signAsync(payload, {
-            secret: this.configService.getConfigService('jwt').ACCESS_TOKEN_SECRET_KEY,
-            expiresIn: this.configService.getConfigService('jwt').ACCESS_TOKEN_EXPIRATION_TIME
-          })
-
-          return forkJoin([refreshToken$, accessToken$]).pipe(
-            mergeMap(([refreshToken, accessToken]) => {
-              const updateSqlPath = this.queryService.getPath('users', 'updateRefreshToken');
-              return this.databaseService.queryByFile(updateSqlPath, [refreshToken, res[0].id]).pipe(
-                map(() => ({
-                  messages: 'User has been registered',
-                  data: {
-                    ...res[0],
-                    refreshToken,
-                    accessToken
-                  }
-                }))
-              );
-            })
-          );
-        }),
-        catchError((err) => {
-          if (err.code === '23505') {
-            throw new BadRequestException('Email already exists');
-          }
-          throw err;
+        const refreshToken$ = this.jwtService.signAsync(payload, {
+          secret: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_SECRET_KEY,
+          expiresIn: this.configService.getConfigService('jwt').JWT_ACCESS_TOKEN_EXPIRATION_TIME
         })
-      );
+        const accessToken$ = this.jwtService.signAsync(payload, {
+          secret: this.configService.getConfigService('jwt').ACCESS_TOKEN_SECRET_KEY,
+          expiresIn: this.configService.getConfigService('jwt').ACCESS_TOKEN_EXPIRATION_TIME
+        })
+
+        return forkJoin([refreshToken$, accessToken$]).pipe(
+          mergeMap(([refreshToken, accessToken]) => {
+            const updateSqlPath = this.queryService.getPath('users', 'updateRefreshToken')
+            return this.databaseService.queryByFile(updateSqlPath, [refreshToken, res[0].id]).pipe(
+              map(() => ({
+                messages: 'User has been registered',
+                data: {
+                  ...res[0],
+                  refreshToken,
+                  accessToken
+                }
+              }))
+            )
+          })
+        )
+      }),
+      catchError((err) => {
+        if (err.code === '23505') {
+          throw new BadRequestException('Email already exists')
+        }
+        throw err
+      })
+    )
   }
 }
-
-

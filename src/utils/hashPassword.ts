@@ -1,9 +1,11 @@
 import { compareSync, genSalt, hash } from 'bcryptjs'
+import { from, map, switchMap } from 'rxjs'
 
-export const hashPassword = async (password: string) => {
-  const salt = await genSalt(10)
-  const hashedPassword = await hash(password, salt as string)
-  return hashedPassword
+export const hashPassword = (password: string) => {
+  return from(genSalt(10)).pipe(
+    switchMap((salt: string) => from(hash(password, salt))),
+    map((hashedPassword: string) => hashedPassword)
+  )
 }
 
 export const comparePassword = (password: string, hashedPassword: string): boolean => {
