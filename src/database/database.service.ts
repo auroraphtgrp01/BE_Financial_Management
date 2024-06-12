@@ -3,13 +3,13 @@ import { Pool } from 'pg'
 import { Observable, finalize, from, map, switchMap, catchError, mergeMap, of } from 'rxjs'
 import { resolveSql } from 'src/database/resolveSql'
 import { IMigrateParams } from 'src/interfaces/Common.interface'
-import { PathService } from 'src/path/path.service'
+import { QueryService } from 'src/query/query.service'
 
 @Injectable()
 export class DatabaseService {
   constructor(
     @Inject('PG_POOL') private readonly pgService: Pool,
-    private readonly pathService: PathService
+    private readonly queryService: QueryService
   ) {}
   query(sql: string, params?: any[]): Observable<any[]> {
     return from(this.pgService.connect()).pipe(
@@ -29,12 +29,12 @@ export class DatabaseService {
     return this.pgService.query(sql)
   }
   migrate(option: IMigrateParams) {
-    const keyofMigrateDDL = this.pathService.getAllEntities()
+    const keyofMigrateDDL = this.queryService.getAllEntities()
     if (option.isDDL) {
       of(...keyofMigrateDDL)
         .pipe(
           mergeMap((key) =>
-            this.queryByFile(this.pathService.getPath(key, 'ddl')).pipe(
+            this.queryByFile(this.queryService.getPath(key, 'ddl')).pipe(
               catchError((error) => {
                 console.error(`Error migrating ${key} DDL: ${error.message}`)
                 return of(null)

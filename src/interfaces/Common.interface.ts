@@ -14,12 +14,13 @@ export interface IConfigService {
   }
 }
 
-export interface IPathService {
+export interface IQueryService {
   users: IQueryUserOptions
 }
 
 export interface IQueryUserOptions extends IQueryOptions {
   findUserById?: string
+  insertNewUser: string
 }
 
 export interface IQueryOptions {
@@ -41,4 +42,14 @@ export interface basePath {
 }
 export interface DynamicType {
   [key: string]: any
+}
+
+export interface IDeleteDateTime {
+  deletedAt: string
+  deletedBy: string
+}
+
+export interface IUpdateDateTime {
+  updatedAt: string
+  updatedBy: string
 }

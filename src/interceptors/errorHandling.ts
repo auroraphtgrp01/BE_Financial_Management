@@ -12,10 +12,7 @@ export class ErrorHandlingInterceptor implements NestInterceptor {
               {
                 statusCode: err.statusCode,
                 message: err.message,
-                data: {
-                  result: err,
-                  meta: {}
-                }
+                data: err
               },
               err.statusCode || HttpStatus.BAD_REQUEST
             )
